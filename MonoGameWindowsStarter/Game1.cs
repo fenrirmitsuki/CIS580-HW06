@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace MonoGameWindowsStarter
 {
@@ -11,11 +12,19 @@ namespace MonoGameWindowsStarter
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Ball ball;
+        Player player;
+
+        public Random Random = new Random();
+
+        KeyboardState keyboardState;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            ball = new Ball(this);
+            player = new Player(this);
         }
 
         /// <summary>
@@ -26,7 +35,12 @@ namespace MonoGameWindowsStarter
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            graphics.PreferredBackBufferWidth = 1500;
+            graphics.PreferredBackBufferHeight = 900;
+            graphics.ApplyChanges();
+
+            ball.Initialize();
+            player.Initialize();
 
             base.Initialize();
         }
@@ -39,6 +53,9 @@ namespace MonoGameWindowsStarter
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            ball.LoadContent(Content);
+            player.LoadContent(Content);
 
             // TODO: use this.Content to load your game content here
         }
@@ -59,10 +76,47 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            keyboardState = Keyboard.GetState();
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            ball.Update(gameTime);
+            player.Update(gameTime);
+
             // TODO: Add your update logic here
+            if(player.Bounds.CollidesWith(ball.Bounds))
+            {
+                if(!((ball.Bounds.Y > player.Bounds.Y + player.Bounds.Height) || (ball.Bounds.Y + ball.Bounds.Radius < player.Bounds.Y)))
+                {
+                    ball.Velocity.Y *= -1;
+
+                    int sfx = Random.Next(2);
+                    if(sfx == 1)
+                    {
+                        player.playerBounce01.Play();
+                    }
+                    else
+                    {
+                        player.playerBounce02.Play();
+                    }
+
+                }
+                else if(!((ball.Bounds.X > player.Bounds.X + player.Bounds.Width) || (ball.Bounds.X + ball.Bounds.Radius < player.Bounds.X)))
+                {
+                    ball.Velocity.X *= -1;
+
+                    int sfx = Random.Next(1,2);
+                    if (sfx == 1)
+                    {
+                        player.playerBounce01.Play();
+                    }
+                    else
+                    {
+                        player.playerBounce02.Play();
+                    }
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -76,6 +130,10 @@ namespace MonoGameWindowsStarter
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            ball.Draw(spriteBatch);
+            player.Draw(spriteBatch);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

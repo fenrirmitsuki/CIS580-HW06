@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
+
+namespace MonoGameWindowsStarter
+{
+    public class Ball
+    {
+        
+        Game1 game;
+        Texture2D texture;
+        SoundEffect wallBounce;
+        public BoundingCircle Bounds;
+        public Vector2 Velocity;
+
+        //Create new Ball
+        public Ball(Game1 game)
+        {
+            this.game = game;
+        }
+
+        //Initialize Ball
+        public void Initialize()
+        {
+            //Set ball's radius to 25 pixels
+            Bounds.Radius = 50;
+
+            //Set ball's starting position to top-middle of window
+            Bounds.X = game.GraphicsDevice.Viewport.Width / 2;
+            Bounds.Y = 0;
+
+            //give Ball random velocity
+            Velocity = new Vector2((float)game.Random.NextDouble(), (float)game.Random.NextDouble());
+            Velocity.Normalize();
+        }
+
+        //Load Ball's textures and SFX
+        public void LoadContent(ContentManager content)
+        {
+            texture = content.Load<Texture2D>("ball");
+            wallBounce = content.Load<SoundEffect>("bounce01");
+        }
+
+        //Update Ball position and bounce off walls
+        public void Update(GameTime gameTime)
+        {
+            var viewport = game.GraphicsDevice.Viewport;
+
+            Bounds.Center += (float)gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+
+            if(Bounds.Center.Y < Bounds.Radius)
+            {
+                Velocity.Y *= -1;
+                float delta = Bounds.Radius - Bounds.Y;
+                Bounds.Y += 2 * delta;
+                wallBounce.Play();
+            }
+            if (Bounds.Center.Y > viewport.Height - Bounds.Radius)
+            {
+                Velocity.Y *= -1;
+                float delta = viewport.Height - Bounds.Radius - Bounds.Y;
+                Bounds.Y += 2 * delta;
+                wallBounce.Play();
+            }
+            if (Bounds.X < 0)
+            {
+                Velocity.X *= -1;
+                float delta = 0 - Bounds.X;
+                Bounds.X += 2 * delta;
+                wallBounce.Play();
+            }
+            if (Bounds.Center.X > viewport.Width - Bounds.Radius)
+            {
+                Velocity.X *= -1;
+                float delta = viewport.Width - Bounds.Radius - Bounds.X;
+                Bounds.X += 2 * delta;
+                wallBounce.Play();
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(texture, Bounds, Color.White);
+        }
+    }
+}
