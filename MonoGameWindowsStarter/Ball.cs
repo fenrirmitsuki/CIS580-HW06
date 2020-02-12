@@ -10,6 +10,12 @@ using Microsoft.Xna.Framework.Content;
 
 namespace MonoGameWindowsStarter
 {
+    public enum GameState
+    {
+        Game = 0,
+        Over = 1,
+    }
+
     public class Ball
     {
         
@@ -18,11 +24,14 @@ namespace MonoGameWindowsStarter
         SoundEffect wallBounce;
         public BoundingCircle Bounds;
         public Vector2 Velocity;
+        public GameState State;
+        SpriteFont font;
 
         //Create new Ball
         public Ball(Game1 game)
         {
             this.game = game;
+            State = GameState.Game;
         }
 
         //Initialize Ball
@@ -45,6 +54,7 @@ namespace MonoGameWindowsStarter
         {
             texture = content.Load<Texture2D>("ball");
             wallBounce = content.Load<SoundEffect>("bounce01");
+            font = content.Load<SpriteFont>("defaultFont");
         }
 
         //Update Ball position and bounce off walls
@@ -63,9 +73,8 @@ namespace MonoGameWindowsStarter
             }
             if (Bounds.Center.Y > viewport.Height - Bounds.Radius)
             {
-                Velocity.Y *= -1;
-                float delta = viewport.Height - Bounds.Radius - Bounds.Y;
-                Bounds.Y += 2 * delta;
+                Velocity = Vector2.Zero;
+                State = GameState.Over;
                 wallBounce.Play();
             }
             if (Bounds.X < 0)
@@ -87,6 +96,11 @@ namespace MonoGameWindowsStarter
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(texture, Bounds, Color.White);
+
+            if(State == GameState.Over)
+            {
+                spriteBatch.DrawString(font, "Game Over", new Vector2(500,500), Color.DarkRed);
+            }
         }
     }
 }

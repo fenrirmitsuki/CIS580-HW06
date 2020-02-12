@@ -14,6 +14,8 @@ namespace MonoGameWindowsStarter
         SpriteBatch spriteBatch;
         Ball ball;
         Player player;
+        SpriteFont font;
+        int score;
 
         public Random Random = new Random();
 
@@ -42,6 +44,8 @@ namespace MonoGameWindowsStarter
             ball.Initialize();
             player.Initialize();
 
+            score = 0;
+
             base.Initialize();
         }
 
@@ -56,6 +60,7 @@ namespace MonoGameWindowsStarter
 
             ball.LoadContent(Content);
             player.LoadContent(Content);
+            font = Content.Load<SpriteFont>("defaultFont");
 
             // TODO: use this.Content to load your game content here
         }
@@ -91,6 +96,11 @@ namespace MonoGameWindowsStarter
                 {
                     ball.Velocity.Y *= -1;
 
+                    if(ball.State == GameState.Game)
+                    {
+                        score++;
+                    }
+                    
                     int sfx = Random.Next(2);
                     if(sfx == 1)
                     {
@@ -105,6 +115,10 @@ namespace MonoGameWindowsStarter
                 else if(!((ball.Bounds.X > player.Bounds.X + player.Bounds.Width) || (ball.Bounds.X + ball.Bounds.Radius < player.Bounds.X)))
                 {
                     ball.Velocity.X *= -1;
+                    if (ball.State == GameState.Game)
+                    {
+                        score++;
+                    }
 
                     int sfx = Random.Next(1,2);
                     if (sfx == 1)
@@ -133,6 +147,11 @@ namespace MonoGameWindowsStarter
             spriteBatch.Begin();
             ball.Draw(spriteBatch);
             player.Draw(spriteBatch);
+
+            spriteBatch.DrawString(font, "Use the arrow keys to move", new Vector2(1,1), Color.White);
+            spriteBatch.DrawString(font, "Bounce the ball to earn points", new Vector2(1,19), Color.White);
+            spriteBatch.DrawString(font, "Don't let the ball past you", new Vector2(1,38), Color.White);
+            spriteBatch.DrawString(font, $"Score: {score}", new Vector2(500, 1), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);

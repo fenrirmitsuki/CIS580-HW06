@@ -15,9 +15,9 @@ namespace MonoGameWindowsStarter
     {
         South = 0,
         East = 1,
-        North = 2,
-        West = 3,
-        Idle = 4
+        West = 2,
+        North = 3,
+        Idle = 4,
     }
 
     public class Player
@@ -28,19 +28,21 @@ namespace MonoGameWindowsStarter
         public SoundEffect playerBounce01;
         public SoundEffect playerBounce02;
 
-        const int ANIM_FRAMRATE = 124;
-        const float PLAYER_SPEED = 100;
-        const int FRAME_WIDTH = 100;
-        const int FRAME_HEIGHT = 100;
+        const int ANIM_FRAMERATE = 124;
+        const float PLAYER_SPEED = 1;
+        const int FRAME_WIDTH = 49;
+        const int FRAME_HEIGHT = 63;
         State state;
         TimeSpan timer;
         int frame;
+        Vector2 position;
 
         public Player(Game1 game)
         {
             this.game = game;
             timer = new TimeSpan(0);
             state = State.Idle;
+            position = new Vector2(200,200);
         }
 
         public void Initialize()
@@ -49,11 +51,14 @@ namespace MonoGameWindowsStarter
             Bounds.Height = 150;
             Bounds.X = (game.GraphicsDevice.Viewport.Width) / 2;
             Bounds.Y = (game.GraphicsDevice.Viewport.Height) - Bounds.Height;
+
+            position.X = (game.GraphicsDevice.Viewport.Width) / 2;
+            position.Y = (game.GraphicsDevice.Viewport.Height) - Bounds.Height;
         }
 
         public void LoadContent(ContentManager content)
         {
-            texture = content.Load<Texture2D>("playerSheet");
+            texture = content.Load<Texture2D>("spriteSheet");
             playerBounce01 = content.Load<SoundEffect>("bounce02");
             playerBounce02 = content.Load<SoundEffect>("bounce03");
         }
@@ -61,16 +66,31 @@ namespace MonoGameWindowsStarter
         public void Update(GameTime gameTime)
         {
             var keyboardState = Keyboard.GetState();
+            float delta = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
 
-            if(keyboardState.IsKeyDown(Keys.Left))
+            if(keyboardState.IsKeyDown(Keys.Up))
+            {
+                state = State.North;
+                Bounds.Y -= delta * PLAYER_SPEED;
+                //position.Y -= delta * PLAYER_SPEED;
+            }
+            else if(keyboardState.IsKeyDown(Keys.Left))
             {
                 state = State.West;
-                Bounds.X -= (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                Bounds.X -= delta * PLAYER_SPEED;
+                //position.X -= delta * PLAYER_SPEED; ;
             }
             else if(keyboardState.IsKeyDown(Keys.Right))
             {
                 state = State.East;
-                Bounds.X += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                Bounds.X += delta * PLAYER_SPEED;
+                //position.X += delta * PLAYER_SPEED;
+            }
+            else if(keyboardState.IsKeyDown(Keys.Down))
+            {
+                state = State.South;
+                Bounds.Y += delta * PLAYER_SPEED; ;
+                //position.Y += delta * PLAYER_SPEED;
             }
             else
             {
@@ -82,21 +102,30 @@ namespace MonoGameWindowsStarter
                 timer += gameTime.ElapsedGameTime;
             }
 
-            if(Bounds.X < 0)
+            while (timer.TotalMilliseconds > ANIM_FRAMERATE)
+            {
+                frame++;
+                timer -= new TimeSpan(0, 0, 0, 0, ANIM_FRAMERATE);
+            }
+            frame %= 4;
+
+            if (Bounds.X < 0)
             {
                 Bounds.X = 0;
             }
-            if(Bounds.X > game.GraphicsDevice.Viewport.Width - Bounds.Width)
+            if (Bounds.X > game.GraphicsDevice.Viewport.Width - Bounds.Width)
             {
                 Bounds.X = game.GraphicsDevice.Viewport.Width - Bounds.Width;
             }
-
-            while(timer.TotalMilliseconds > ANIM_FRAMRATE)
+            if (Bounds.Y > game.GraphicsDevice.Viewport.Height - Bounds.Height)
             {
-                frame++;
-                timer -= new TimeSpan(0,0,0,0, ANIM_FRAMRATE);
+                Bounds.Y = game.GraphicsDevice.Viewport.Height - Bounds.Height;
             }
-            frame %= 4;
+            if (Bounds.Y < 2 * (game.GraphicsDevice.Viewport.Height) / 3)
+            {
+                Bounds.Y = 2 * (game.GraphicsDevice.Viewport.Height) / 3;
+            }
+
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -107,7 +136,8 @@ namespace MonoGameWindowsStarter
                 FRAME_WIDTH,
                 FRAME_HEIGHT
                 );
-            spriteBatch.Draw(texture, Bounds, Color.White);
+
+            spriteBatch.Draw(texture, Bounds, source, Color.White);
         }
     }
 }
