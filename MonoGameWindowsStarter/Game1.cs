@@ -16,6 +16,11 @@ namespace MonoGameWindowsStarter
         Player player;
         SpriteFont font;
         int score;
+        BoundingRectangle wallN;
+        BoundingRectangle wallS;
+        BoundingRectangle wallE;
+        BoundingRectangle wallW;
+        Texture2D wallText;
 
         public Random Random = new Random();
 
@@ -46,6 +51,26 @@ namespace MonoGameWindowsStarter
 
             score = 0;
 
+            wallN.X = -50;
+            wallN.Y = -50;
+            wallN.Width = 1850;
+            wallN.Height = 50;
+
+            wallS.X = -50;
+            wallS.Y = 1000;
+            wallS.Width = 1850;
+            wallS.Height = 50;
+
+            wallE.X = 1750;
+            wallE.Y = 0;
+            wallE.Width = 50;
+            wallE.Height = 1000;
+
+            wallW.X = -50;
+            wallW.Y = 0;
+            wallW.Width = 50;
+            wallW.Height = 1000;
+
             base.Initialize();
         }
 
@@ -61,6 +86,7 @@ namespace MonoGameWindowsStarter
             ball.LoadContent(Content);
             player.LoadContent(Content);
             font = Content.Load<SpriteFont>("defaultFont");
+            wallText = Content.Load<Texture2D>("pixel");
 
             // TODO: use this.Content to load your game content here
         }
@@ -143,14 +169,21 @@ namespace MonoGameWindowsStarter
         {
             GraphicsDevice.Clear(Color.DeepSkyBlue);
 
-            var offset = new Vector2(10, 10) - player.Position;
+            var offset = new Vector2(750, 500);
+            offset.X -= player.Bounds.X;
+            offset.Y -= player.Bounds.Y;
             var tMatrix = Matrix.CreateTranslation(offset.X, offset.Y, 0);
 
             // TODO: Add your drawing code here
-            //spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, tMatrix);
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, tMatrix);
+            //spriteBatch.Begin();
             ball.Draw(spriteBatch);
             player.Draw(spriteBatch);
+
+            spriteBatch.Draw(wallText, wallN, Color.Brown);
+            spriteBatch.Draw(wallText, wallS, Color.Brown);
+            spriteBatch.Draw(wallText, wallE, Color.Brown);
+            spriteBatch.Draw(wallText, wallW, Color.Brown);
 
             spriteBatch.DrawString(font, "Use the arrow keys to move", new Vector2(1,1), Color.White);
             spriteBatch.DrawString(font, "Bounce the ball to earn points", new Vector2(1,19), Color.White);

@@ -118,17 +118,17 @@ namespace MonoGameWindowsStarter
             {
                 Bounds.X = 0;
             }
-            if (Bounds.X > game.GraphicsDevice.Viewport.Width - Bounds.Width)
+            if (Bounds.X > 1750 - Bounds.Width)
             {
-                Bounds.X = game.GraphicsDevice.Viewport.Width - Bounds.Width;
+                Bounds.X = 1750 - Bounds.Width;
             }
-            if (Bounds.Y > game.GraphicsDevice.Viewport.Height - Bounds.Height)
+            if (Bounds.Y > 1000 - Bounds.Height)
             {
-                Bounds.Y = game.GraphicsDevice.Viewport.Height - Bounds.Height;
+                Bounds.Y = 1000 - Bounds.Height;
             }
-            if (Bounds.Y < 2 * (game.GraphicsDevice.Viewport.Height) / 3)
+            if (Bounds.Y < 0)
             {
-                Bounds.Y = 2 * (game.GraphicsDevice.Viewport.Height) / 3;
+                Bounds.Y = 0;
             }
 
         }
