@@ -195,7 +195,7 @@ namespace MonoGameWindowsStarter
             textOffset3.X += 500;
 
             spriteBatch.DrawString(font, "Use the arrow keys to move", textOffset1, Color.White);
-            spriteBatch.DrawString(font, "Dodge the ball", textOffset2, Color.White);
+            spriteBatch.DrawString(font, "Dodge the balls", textOffset2, Color.White);
             spriteBatch.DrawString(font, $"Score: {score}", textOffset3, Color.White);
 
             if ((ball1.State == GameState.Over) || (ball2.State == GameState.Over))
