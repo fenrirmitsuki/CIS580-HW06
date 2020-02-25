@@ -64,30 +64,31 @@ namespace MonoGameWindowsStarter
 
             Bounds.Center += (float)gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
 
-            if(Bounds.Center.Y < Bounds.Radius)
+            if(Bounds.Center.Y - Bounds.Radius < 0)
             {
                 Velocity.Y *= -1;
                 float delta = Bounds.Radius - Bounds.Y;
                 Bounds.Y += 2 * delta;
                 wallBounce.Play();
             }
-            if (Bounds.Center.Y > viewport.Height - Bounds.Radius)
+            if (Bounds.Center.Y + Bounds.Radius > 1000)
             {
-                Velocity = Vector2.Zero;
-                State = GameState.Over;
+                Velocity.Y *= -1;
+                float delta = 1000 - Bounds.Radius - Bounds.Y;
+                Bounds.Y += 2 * delta;
                 wallBounce.Play();
             }
-            if (Bounds.X < 0)
+            if (Bounds.Center.X - Bounds.Radius < 0)
             {
                 Velocity.X *= -1;
-                float delta = 0 - Bounds.X;
+                float delta = Bounds.Radius - Bounds.X;
                 Bounds.X += 2 * delta;
                 wallBounce.Play();
             }
-            if (Bounds.Center.X > viewport.Width - Bounds.Radius)
+            if (Bounds.Center.X + Bounds.Radius > 1750)
             {
                 Velocity.X *= -1;
-                float delta = viewport.Width - Bounds.Radius - Bounds.X;
+                float delta = 1750 - Bounds.Radius - Bounds.X;
                 Bounds.X += 2 * delta;
                 wallBounce.Play();
             }
@@ -96,11 +97,6 @@ namespace MonoGameWindowsStarter
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(texture, Bounds, Color.White);
-
-            if(State == GameState.Over)
-            {
-                spriteBatch.DrawString(font, "Game Over", new Vector2(500,500), Color.White);
-            }
         }
     }
 }

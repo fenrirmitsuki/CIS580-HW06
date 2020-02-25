@@ -12,7 +12,8 @@ namespace MonoGameWindowsStarter
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Ball ball;
+        Ball ball1;
+        Ball ball2;
         Player player;
         SpriteFont font;
         int score;
@@ -30,7 +31,8 @@ namespace MonoGameWindowsStarter
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            ball = new Ball(this);
+            ball1 = new Ball(this);
+            ball2 = new Ball(this);
             player = new Player(this);
         }
 
@@ -46,7 +48,8 @@ namespace MonoGameWindowsStarter
             graphics.PreferredBackBufferHeight = 900;
             graphics.ApplyChanges();
 
-            ball.Initialize();
+            ball1.Initialize();
+            ball2.Initialize();
             player.Initialize();
 
             score = 0;
@@ -83,7 +86,8 @@ namespace MonoGameWindowsStarter
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            ball.LoadContent(Content);
+            ball1.LoadContent(Content);
+            ball2.LoadContent(Content);
             player.LoadContent(Content);
             font = Content.Load<SpriteFont>("defaultFont");
             wallText = Content.Load<Texture2D>("pixel");
@@ -112,49 +116,47 @@ namespace MonoGameWindowsStarter
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            ball.Update(gameTime);
+            ball1.Update(gameTime);
+            ball2.Update(gameTime);
             player.Update(gameTime);
 
-            // TODO: Add your update logic here
-            if(player.Bounds.CollidesWith(ball.Bounds))
+            if ((ball1.State == GameState.Game) && (ball2.State == GameState.Game))
             {
-                if(!((ball.Bounds.Y > player.Bounds.Y + player.Bounds.Height) || (ball.Bounds.Y + ball.Bounds.Radius < player.Bounds.Y)))
-                {
-                    ball.Velocity.Y *= -1;
+                score++;
+            }
 
-                    if(ball.State == GameState.Game)
-                    {
-                        score++;
-                    }
-                    
-                    int sfx = Random.Next(2);
-                    if(sfx == 1)
-                    {
-                        player.playerBounce01.Play();
-                    }
-                    else
-                    {
-                        player.playerBounce02.Play();
-                    }
+            // TODO: Add your update logic here
+            if(player.Bounds.CollidesWith(ball1.Bounds))
+            {
+                if(!((ball1.Bounds.Y > player.Bounds.Y + player.Bounds.Height) || (ball1.Bounds.Y + ball1.Bounds.Radius < player.Bounds.Y)))
+                {
+                    ball1.Velocity *= 0;
+                    ball2.Velocity *= 0;
+                    ball1.State = GameState.Over;
 
                 }
-                else if(!((ball.Bounds.X > player.Bounds.X + player.Bounds.Width) || (ball.Bounds.X + ball.Bounds.Radius < player.Bounds.X)))
+                else if(!((ball1.Bounds.X > player.Bounds.X + player.Bounds.Width) || (ball1.Bounds.X + ball1.Bounds.Radius < player.Bounds.X)))
                 {
-                    ball.Velocity.X *= -1;
-                    if (ball.State == GameState.Game)
-                    {
-                        score++;
-                    }
+                    ball1.Velocity *= 0;
+                    ball2.Velocity *= 0;
+                    ball1.State = GameState.Over;
+                }
+            }
 
-                    int sfx = Random.Next(1,2);
-                    if (sfx == 1)
-                    {
-                        player.playerBounce01.Play();
-                    }
-                    else
-                    {
-                        player.playerBounce02.Play();
-                    }
+            if (player.Bounds.CollidesWith(ball2.Bounds))
+            {
+                if (!((ball2.Bounds.Y > player.Bounds.Y + player.Bounds.Height) || (ball2.Bounds.Y + ball2.Bounds.Radius < player.Bounds.Y)))
+                {
+                    ball2.Velocity *= 0;
+                    ball1.Velocity *= 0;
+                    ball2.State = GameState.Over;
+
+                }
+                else if (!((ball2.Bounds.X > player.Bounds.X + player.Bounds.Width) || (ball2.Bounds.X + ball2.Bounds.Radius < player.Bounds.X)))
+                {
+                    ball2.Velocity *= 0;
+                    ball1.Velocity *= 0;
+                    ball2.State = GameState.Over;
                 }
             }
 
@@ -177,7 +179,8 @@ namespace MonoGameWindowsStarter
             // TODO: Add your drawing code here
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, tMatrix);
             //spriteBatch.Begin();
-            ball.Draw(spriteBatch);
+            ball1.Draw(spriteBatch);
+            ball2.Draw(spriteBatch);
             player.Draw(spriteBatch);
 
             spriteBatch.Draw(wallText, wallN, Color.Brown);
@@ -185,10 +188,24 @@ namespace MonoGameWindowsStarter
             spriteBatch.Draw(wallText, wallE, Color.Brown);
             spriteBatch.Draw(wallText, wallW, Color.Brown);
 
-            spriteBatch.DrawString(font, "Use the arrow keys to move", new Vector2(1,1), Color.White);
-            spriteBatch.DrawString(font, "Bounce the ball to earn points", new Vector2(1,19), Color.White);
-            spriteBatch.DrawString(font, "Don't let the ball past you", new Vector2(1,38), Color.White);
-            spriteBatch.DrawString(font, $"Score: {score}", new Vector2(500, 1), Color.White);
+            var textOffset1 = offset * -1;
+            var textOffset2 = offset * -1;
+            textOffset2.Y += 31;
+            var textOffset3 = offset * -1;
+            textOffset3.X += 500;
+
+            spriteBatch.DrawString(font, "Use the arrow keys to move", textOffset1, Color.White);
+            spriteBatch.DrawString(font, "Dodge the ball", textOffset2, Color.White);
+            spriteBatch.DrawString(font, $"Score: {score}", textOffset3, Color.White);
+
+            if ((ball1.State == GameState.Over) || (ball2.State == GameState.Over))
+            {
+                var textOffsetGameOver = offset * -1;
+                textOffsetGameOver.X += 500;
+                textOffsetGameOver.Y += 500;
+                spriteBatch.DrawString(font, "Game Over", textOffsetGameOver, Color.White);
+            }
+
             spriteBatch.End();
 
             base.Draw(gameTime);
