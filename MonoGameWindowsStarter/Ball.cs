@@ -99,7 +99,7 @@ namespace MonoGameWindowsStarter
 
             if(State == GameState.Over)
             {
-                spriteBatch.DrawString(font, "Game Over", new Vector2(500,500), Color.DarkRed);
+                spriteBatch.DrawString(font, "Game Over", new Vector2(500,500), Color.White);
             }
         }
     }

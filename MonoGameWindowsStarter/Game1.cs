@@ -141,9 +141,13 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.DeepSkyBlue);
+
+            var offset = new Vector2(10, 10) - player.Position;
+            var tMatrix = Matrix.CreateTranslation(offset.X, offset.Y, 0);
 
             // TODO: Add your drawing code here
+            //spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, tMatrix);
             spriteBatch.Begin();
             ball.Draw(spriteBatch);
             player.Draw(spriteBatch);

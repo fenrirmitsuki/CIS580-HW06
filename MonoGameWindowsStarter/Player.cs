@@ -35,25 +35,30 @@ namespace MonoGameWindowsStarter
         State state;
         TimeSpan timer;
         int frame;
-        Vector2 position;
+        public Vector2 Position;
+        Vector2 origin;
 
         public Player(Game1 game)
         {
             this.game = game;
             timer = new TimeSpan(0);
             state = State.Idle;
-            position = new Vector2(200,200);
+            Position = new Vector2(200,200);
+            origin = new Vector2(0,0);
         }
 
         public void Initialize()
         {
+
+            //Bounds = new BoundingRectangle(Position - 1.8f * origin, 100, 150);
             Bounds.Width = 100;
             Bounds.Height = 150;
             Bounds.X = (game.GraphicsDevice.Viewport.Width) / 2;
             Bounds.Y = (game.GraphicsDevice.Viewport.Height) - Bounds.Height;
 
-            position.X = (game.GraphicsDevice.Viewport.Width) / 2;
-            position.Y = (game.GraphicsDevice.Viewport.Height) - Bounds.Height;
+
+            Position.X = (game.GraphicsDevice.Viewport.Width) / 2;
+            Position.Y = (game.GraphicsDevice.Viewport.Height) - Bounds.Height;
         }
 
         public void LoadContent(ContentManager content)
@@ -137,7 +142,8 @@ namespace MonoGameWindowsStarter
                 FRAME_HEIGHT
                 );
 
-            spriteBatch.Draw(texture, Bounds, source, Color.White);
+            //spriteBatch.Draw(texture, Bounds, source, Color.White);
+            spriteBatch.Draw(texture, Bounds, source, Color.White, 0, origin, SpriteEffects.None, 1);
         }
     }
 }
