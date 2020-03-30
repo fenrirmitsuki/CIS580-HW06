@@ -22,6 +22,10 @@ namespace MonoGameWindowsStarter
         BoundingRectangle wallE;
         BoundingRectangle wallW;
         Texture2D wallText;
+        ParticleSystem particleSystem1;
+        ParticleSystem particleSystem2;
+        ParticleSystem particleSystem3;
+        Texture2D particleTexture;
 
         public Random Random = new Random();
 
@@ -93,6 +97,65 @@ namespace MonoGameWindowsStarter
             wallText = Content.Load<Texture2D>("pixel");
 
             // TODO: use this.Content to load your game content here
+            particleTexture = Content.Load<Texture2D>("pixel");
+            particleSystem1 = new ParticleSystem(this.GraphicsDevice, 1000, particleTexture);
+            //particleSystem1.Emitter = new Vector2(ball1.Bounds.X, ball1.Bounds.Y);
+            particleSystem1.SpawnPerFrame = 4;
+            particleSystem1.SpawnParticle = (ref Particle particle) =>
+            {
+                particle.Position = new Vector2(ball1.Bounds.X, ball1.Bounds.Y);
+                particle.Velocity = new Vector2(MathHelper.Lerp(-50, 50, (float)Random.NextDouble()), MathHelper.Lerp(0, 100, (float)Random.NextDouble()));
+                particle.Acceleration = 0.1f * new Vector2(0, (float)-Random.NextDouble());
+                particle.Color = Color.Red;
+                particle.Scale = 3f;
+                particle.Life = 4.0f;
+            };
+            particleSystem1.UpdateParticle = (float deltaT, ref Particle particle) =>
+            {
+                particle.Velocity += deltaT * particle.Acceleration;
+                particle.Position += deltaT * particle.Velocity;
+                particle.Scale -= deltaT;
+                particle.Life -= deltaT;
+            };
+
+            particleSystem2 = new ParticleSystem(this.GraphicsDevice, 5000, particleTexture);
+            particleSystem2.SpawnPerFrame = 6;
+            particleSystem2.SpawnParticle = (ref Particle particle) =>
+            {
+                particle.Position = new Vector2(ball2.Bounds.X, ball2.Bounds.Y);
+                particle.Velocity = new Vector2(MathHelper.Lerp(-25, 25, (float)Random.NextDouble()), MathHelper.Lerp(0, 100, (float)Random.NextDouble()));
+                particle.Acceleration = 0.1f * new Vector2(0, (float)-Random.NextDouble());
+                particle.Color = Color.Red;
+                particle.Scale = 3f;
+                particle.Life = 3.0f;
+            };
+            particleSystem2.UpdateParticle = (float deltaT, ref Particle particle) =>
+            {
+                particle.Velocity += (deltaT * particle.Acceleration) * .9f;
+                particle.Position += deltaT * -particle.Velocity;
+                particle.Scale -= deltaT;
+                particle.Life -= deltaT;
+            };
+
+            particleSystem3 = new ParticleSystem(this.GraphicsDevice, 2000, particleTexture);
+            particleSystem3.SpawnPerFrame = 1;
+            particleSystem3.SpawnParticle = (ref Particle particle) =>
+            {
+                particle.Position = new Vector2(750, -50);
+                particle.Velocity = new Vector2(MathHelper.Lerp(-1000, 1000, (float)Random.NextDouble()), MathHelper.Lerp(0, 100, (float)Random.NextDouble()));
+                particle.Acceleration = 0.1f * new Vector2(0, (float)-Random.NextDouble());
+                particle.Color = Color.Gold;
+                particle.Scale = 5f;
+                particle.Life = 20.0f;
+            };
+
+            particleSystem3.UpdateParticle = (float deltaT, ref Particle particle) =>
+            {
+                particle.Velocity += (deltaT * particle.Acceleration) * 1.3f;
+                particle.Position += deltaT * particle.Velocity;
+                particle.Scale -= deltaT;
+                particle.Life -= deltaT;
+            };
         }
 
         /// <summary>
@@ -160,6 +223,10 @@ namespace MonoGameWindowsStarter
                 }
             }
 
+            particleSystem1.Update(gameTime);
+            particleSystem2.Update(gameTime);
+            particleSystem3.Update(gameTime);
+
             base.Update(gameTime);
         }
 
@@ -182,6 +249,9 @@ namespace MonoGameWindowsStarter
             ball1.Draw(spriteBatch);
             ball2.Draw(spriteBatch);
             player.Draw(spriteBatch);
+            particleSystem1.Draw();
+            particleSystem2.Draw();
+            particleSystem3.Draw();
 
             spriteBatch.Draw(wallText, wallN, Color.Brown);
             spriteBatch.Draw(wallText, wallS, Color.Brown);
